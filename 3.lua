@@ -101,7 +101,6 @@ task.spawn(function()
             else
                 -- only teleport if HRP is actually outside all zones
                 if lastValidArea then
-                    -- double‑check: are we outside lastValidArea bounds?
                     local size = lastValidArea.Size
                     local pos = lastValidArea.Position
                     local hrpPos = hrp.Position
@@ -111,11 +110,10 @@ task.spawn(function()
                     local withinZ = hrpPos.Z >= pos.Z - size.Z/2 and hrpPos.Z <= pos.Z + size.Z/2
 
                     if not (withinX and withinY and withinZ) then
-                        hrp.CFrame = CFrame.new(lastValidArea.Position + Vector3.new(0,5,0)) -- slight offset to avoid floor
+                        hrp.CFrame = CFrame.new(lastValidArea.Position + Vector3.new(0,5,0))
                         print("Teleported back to last valid training area:", lastValidArea.Name or "unknown")
                     end
                 else
-                    -- fallback: teleport to first area if none recorded yet
                     local fallback = trainingAreas[1]
                     if fallback then
                         hrp.CFrame = CFrame.new(fallback.Position + Vector3.new(0,5,0))
@@ -124,7 +122,7 @@ task.spawn(function()
                 end
             end
         else
-            -- if autoWalk is off or character missing, stop movement
+            -- stop movement when autoWalk is off
             if player.Character and player.Character:FindFirstChild("Humanoid") then
                 player.Character.Humanoid:Move(Vector3.new(0,0,0), true)
             end
@@ -132,10 +130,10 @@ task.spawn(function()
     end
 end)
 
--- Auto Jump loop (force jump state continuously)
+-- Auto Jump loop (jump once every second)
 task.spawn(function()
     while true do
-        task.wait(0.1) -- check every 0.1s
+        task.wait(1) -- every 1 second
         if autoJump and player.Character and player.Character:FindFirstChild("Humanoid") then
             local humanoid = player.Character.Humanoid
             humanoid:ChangeState(Enum.HumanoidStateType.Jumping)

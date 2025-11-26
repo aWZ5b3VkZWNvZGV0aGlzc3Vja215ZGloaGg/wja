@@ -91,42 +91,56 @@ task.spawn(function()
         task.wait(0.1)
         if autoWalk and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
             local hrp = player.Character.HumanoidRootPart
-            local humanoid = player.Character:FindFirstChild("Humanoid")
             local activeArea = getActiveArea(hrp)
 
-            if activeArea and humanoid then
-                -- inside a training area -> walk forward
+            if activeArea then
+                -- inside a training area -> simulate holding W
                 lastValidArea = activeArea
-                humanoid:Move(Vector3.new(0,0,-1), true)
+                UserInputService:SendKeyEvent(true, Enum.KeyCode.W, false, game)
             else
-                -- outside all areas -> teleport back to last valid area
+                -- only teleport if HRP is actually outside all zones
                 if lastValidArea then
-                    hrp.CFrame = CFrame.new(lastValidArea.Position)
-                    print("Teleported back to last valid training area:", lastValidArea.Name or "unknown")
+                    -- double‑check: are we outside lastValidArea bounds?
+                    local size = lastValidArea.Size
+                    local pos = lastValidArea.Position
+                    local hrpPos = hrp.Position
+
+                    local withinX = hrpPos.X >= pos.X - size.X/2 and hrpPos.X <= pos.X + size.X/2
+                    local withinY = hrpPos.Y >= pos.Y - size.Y/2 and hrpPos.Y <= pos.Y + size.Y/2
+                    local withinZ = hrpPos.Z >= pos.Z - size.Z/2 and hrpPos.Z <= pos.Z + size.Z/2
+
+                    if not (withinX and withinY and withinZ) then
+                        hrp.CFrame = CFrame.new(lastValidArea.Position)
+                        UserInputService:SendKeyEvent(false, Enum.KeyCode.W, false, game)
+                        print("Teleported back to last valid training area:", lastValidArea.Name or "unknown")
+                    end
                 else
                     -- fallback: teleport to first area if none recorded yet
                     local fallback = trainingAreas[1]
                     if fallback then
                         hrp.CFrame = CFrame.new(fallback.Position)
+                        UserInputService:SendKeyEvent(false, Enum.KeyCode.W, false, game)
                         print("Teleported back to fallback training area:", fallback.Name or "unknown")
                     end
                 end
             end
+        else
+            -- if autoWalk is off or character missing, release W
+            UserInputService:SendKeyEvent(false, Enum.KeyCode.W, false, game)
         end
     end
 end)
 
--- Auto Jump loop (hold jump continuously)
+-- Auto Jump loop (simulate holding Space)
 task.spawn(function()
     while true do
         task.wait(0.1) -- check every 0.1s
         if autoJump and player.Character and player.Character:FindFirstChild("Humanoid") then
-            local humanoid = player.Character.Humanoid
-            humanoid.Jump = true -- keep jump held down
+            -- press Space (hold down)
+            UserInputService:SendKeyEvent(true, Enum.KeyCode.Space, false, game)
         else
-            if player.Character and player.Character:FindFirstChild("Humanoid") then
-                player.Character.Humanoid.Jump = false
-            end
+            -- release Space when autoJump is off
+            UserInputService:SendKeyEvent(false, Enum.KeyCode.Space, false, game)
         end
     end
 end)

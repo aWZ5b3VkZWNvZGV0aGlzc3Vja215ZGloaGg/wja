@@ -65,12 +65,19 @@ player.Chatted:Connect(function(msg)
     end
 end)
 
--- Function: find active training area (using BaseParts directly)
+-- Function: find active training area (bounding box check)
 local function getActiveArea(hrp)
-    local touching = hrp:GetTouchingParts()
     for _, part in ipairs(trainingAreas) do
-        for _, t in ipairs(touching) do
-            if t == part then
+        if part then
+            local size = part.Size
+            local pos = part.Position
+            local hrpPos = hrp.Position
+
+            local withinX = hrpPos.X >= pos.X - size.X/2 and hrpPos.X <= pos.X + size.X/2
+            local withinY = hrpPos.Y >= pos.Y - size.Y/2 and hrpPos.Y <= pos.Y + size.Y/2
+            local withinZ = hrpPos.Z >= pos.Z - size.Z/2 and hrpPos.Z <= pos.Z + size.Z/2
+
+            if withinX and withinY and withinZ then
                 return part
             end
         end

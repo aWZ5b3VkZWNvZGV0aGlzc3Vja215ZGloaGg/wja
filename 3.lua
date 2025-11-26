@@ -28,32 +28,32 @@ local UserInputService = game:GetService("UserInputService")
 
 -- Command registry
 local commands = {
-    ["method(enableWalk)"] = function()
+    ["method(enablewalk)"] = function()
         autoWalk = true
         print("Auto Walk enabled")
     end,
 
-    ["method(disableWalk)"] = function()
+    ["method(disablewalk)"] = function()
         autoWalk = false
         print("Auto Walk disabled")
     end,
 
-    ["method(enableJump)"] = function()
+    ["method(enablejump)"] = function()
         autoJump = true
         print("Auto Jump enabled")
     end,
 
-    ["method(disableJump)"] = function()
+    ["method(disablejump)"] = function()
         autoJump = false
         print("Auto Jump disabled")
     end,
 
     ["help"] = function()
         print("Available commands:")
-        print("method(enableWalk)")
-        print("method(disableWalk)")
-        print("method(enableJump)")
-        print("method(disableJump)")
+        print("method(enablewalk)")
+        print("method(disablewalk)")
+        print("method(enablejump)")
+        print("method(disablejump)")
     end,
 }
 
